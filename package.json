@@ -5,7 +5,7 @@
     "author": "Ross Golder <ross@golder.org>",
     "contributors": ["Ahmad Benmrad <batikhsouri@gmail.com>"],
     "dependencies": {
-      "odoo-xmlrpc": "git+https://github.com/rossigee/odoo-xmlrpc.git"
+      "odoo-xmlrpc": "git+https://github.com/faisalsami/odoo-xmlrpc.git"
     },
     "repository": {
         "type": "git",
