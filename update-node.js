@@ -1,8 +1,8 @@
 module.exports = function (RED) {
-    var handle_error = function(err, node) {
-        node.log(err.body);
+    var handle_error = function(err, node, msg) {
         node.status({fill: "red", shape: "dot", text: err.message});
-        node.error(err.message);
+        msg.payload = err.message;
+        node.send([null, msg]);
     };
 
     function OdooXMLRPCUpdateNode(config) {
@@ -14,13 +14,13 @@ module.exports = function (RED) {
             node.status({});
             this.host.connect(function(err, odoo_inst) {
                 if (err) {
-                    return handle_error(err, node);
+                    return handle_error(err, node, msg);
                 }
 
                 var inParams;
                 if (msg.payload){
                   if (!Array.isArray(msg.payload)){
-                    return handle_error(new Error('when defined, msg.payload must be an array'), node);
+                    return handle_error('when defined, msg.payload must be an array', node, msg);
                   }
                   inParams = msg.payload
                 } else {
@@ -30,13 +30,16 @@ module.exports = function (RED) {
 
                 var params = [];
                 params.push(inParams);
-                //node.log('Creating object for model "' + config.model + '"...');
+                // console.log('Updating object for model "' + config.model);
+                // console.log(JSON.stringify(params, null, 2));
                 odoo_inst.execute_kw(config.model, 'write', params, function (err, value) {
                     if (err) {
-                        return handle_error(err, node);
+                        return handle_error(err, node, msg);
                     }
+                    node.status({fill: "green", shape: "dot", text: 'Updated'});
                     msg.payload = value;
-                    node.send(msg);
+                    node.send([msg, null]);
+
                 });
             });
         });
